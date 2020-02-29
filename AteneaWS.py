@@ -1,27 +1,22 @@
 from flask import Flask, jsonify
 from flask import request
+from db_connection import db_connection
 import psycopg2
 import json
 
 app = Flask(__name__)
 
-conn = psycopg2.connect(
-    database="",
-    user="",
-    password="",
-    host="localhost",
-    port="5432"
-)
-
-cursor = conn.cursor()
+dbc = db_connection("","","localhost","5432","")
+dbc.connect_to_db()
 
 @app.route("/get_genres", methods=['GET'])
 def get_genres():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-        cursor.execute("Select * From genres;")
-        #row = cursor.__next__()
+       
+        cursor = dbc.execute_query("Select * From genres;")
+        
         for row in cursor:
             cursor_dic = {}
 
@@ -38,8 +33,8 @@ def add_genre():
     if request.method == 'POST':
         request_json = request.get_json()
         
-        cursor.execute("Insert Into genres (name) Values ('{}');".format(request_json["name"]))
-        conn.commit()
+        cursor = dbc.execute_query("Insert Into genres (name) Values ('{}');".format(request_json["name"]))
+        #conn.commit()
         return jsonify({"about":"Success"})
 
 # @app.route('/multi/<int:num>', methods=['GET'])
