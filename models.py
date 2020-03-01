@@ -20,5 +20,10 @@ class genres:
         result = self.conn.insert_record("genres",dic_genre)
         return result
 
+    def delete_genre(self):
+        dic_genre = {'idgenre': self.id}
+        result = self.conn.delete_record("genres",dic_genre)
+        return result
+
     def get_dbconnection(self,dbc):
         self.conn = dbc

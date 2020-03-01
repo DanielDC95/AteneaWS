@@ -11,12 +11,14 @@ class db_connection:
 
     def connect_to_db(self):
         connection = psycopg2.connect(user = self.db_user, password = self.db_password, host = self.db_host, port = self.db_port, database = self.db_database)
-        cursor = connection.cursor()
-        self.cursor = cursor
+        #cursor = connection.cursor()
+        self.connection = connection
 
     def execute_query(self, query):
-        self.cursor.execute(query)
-        return self.cursor
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        self.connection.commit()
+        return cursor
 
     def update_record(self, table, dic, condition):
         fields = ""
@@ -32,7 +34,9 @@ class db_connection:
                 
             query_update = "Update {} Set {} Where {};".format(table,fields,condition)
             #print(query_update)
-            self.cursor.execute(query_update)
+            cursor = self.connection.cursor()
+            cursor.execute(query_update)
+            self.connection.commit()
             result = "Success"
         except:
             result = "Failure"
@@ -55,11 +59,38 @@ class db_connection:
                     values += ", '" + dic[key] + "'"
             
             query_insert = "Insert Into {} ({}) Values ({});".format(table,fields,values)
-            self.cursor.execute(query_insert)
-            #print(query_insert)
+            
+            cursor = self.connection.cursor()
+            print(query_insert)
+            cursor.execute(query_insert)
+            self.connection.commit()
+            
             result = "Success"
         except:
             result = "Failure"
         
         return result
+
+    def delete_record(self, table, conditionDic):
+        result = ""
+        where_string = ""
+        first = True
+        try:
+            for key in conditionDic.keys():
+                if first == True:
+                    where_string = key + " = " + conditionDic[key]
+                    first = False
+                else:
+                    where_string += " And " + key + " = " + conditionDic[key]
+            query_delete = "Delete From {} Where {};".format(table,where_string)
+            print(query_delete)
+            cursor = self.connection.cursor()
+            cursor.execute(query_delete)
+            self.connection.commit()
+            result = "Success"
+        except:
+            result = "Failure"
+        
+        return result
+
 

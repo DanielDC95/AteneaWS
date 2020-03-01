@@ -7,7 +7,7 @@ from models import genres
 
 app = Flask(__name__)
 
-dbc = db_connection("user","password","localhost","5432","ateneadb")
+dbc = db_connection("postgres","1234","localhost","5432","ateneadb")
 dbc.connect_to_db()
 
 #Returns a genre list
@@ -34,7 +34,11 @@ def get_genres():
 def add_genre():
     if request.method == 'POST':
         request_json = request.get_json()
-        my_genre = genres("0","{}".format(request_json["name"]))
+        id = 0
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        print(name)
+        my_genre = genres(id,name)
         my_genre.get_dbconnection(dbc)
         result = my_genre.add_genre()
         
@@ -49,6 +53,17 @@ def update_genre():
         my_genre.get_dbconnection(dbc)
         result = my_genre.update_genre()
         return jsonify({"about":"{}".format(result)})
+
+#Delete a genre
+@app.route("/delete_genre", methods = ['POST'])
+def delete_genre():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        my_genre = genres("{}".format(request_json["id"]),"{}".format(request_json["name"]))
+        my_genre.get_dbconnection(dbc)
+        result = my_genre.delete_genre()
+        return jsonify({"about":"{}".format(result)})
+
 
 # @app.route('/multi/<int:num>', methods=['GET'])
 # def get_multiply10(num):
