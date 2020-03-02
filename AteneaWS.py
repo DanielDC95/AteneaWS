@@ -3,7 +3,7 @@ from flask import request
 from db_connection import db_connection
 import psycopg2
 import json
-from models import genres, publishers
+from models import genres, publishers, authors
 
 app = Flask(__name__)
 
@@ -121,6 +121,65 @@ def delete_publisher():
         my_publisher = publishers("{}".format(request_json["id"]),name)
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.delete_publisher()
+        return jsonify({"about":"{}".format(result)})
+
+#////////////////////////////////////////////////////////////////////////////////////////////////////////////77
+
+#Returns a author list
+@app.route("/get_authors", methods=['GET'])
+def get_authors():
+    if (request.method == 'GET'):
+        query_result = []
+        cursor_dic = {}
+       
+        cursor = dbc.execute_query("Select * From authors;")
+        
+        for row in cursor:
+            cursor_dic = {}
+
+            for col, description in enumerate(cursor.description):
+                cursor_dic.update({description[0] : row[col]})
+            
+            query_result.append(cursor_dic)
+        
+        return jsonify(query_result)
+
+#Add a new author
+@app.route("/add_author", methods = ['POST'])
+def add_author():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        id = 0
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        my_author = authors(id,name)
+        my_author.get_dbconnection(dbc)
+        result = my_author.add_author()
+        
+        return jsonify({"about":"{}".format(result)})
+
+#Update a author
+@app.route("/update_author", methods = ['POST'])
+def update_author():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        my_author = authors("{}".format(request_json["id"]),name)
+        my_author.get_dbconnection(dbc)
+        result = my_author.update_author()
+        return jsonify({"about":"{}".format(result)})
+
+#Delete a author
+@app.route("/delete_author", methods = ['POST'])
+def delete_author():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        my_author = authors("{}".format(request_json["id"]),name)
+        my_author.get_dbconnection(dbc)
+        result = my_author.delete_author()
         return jsonify({"about":"{}".format(result)})
 
 # @app.route('/multi/<int:num>', methods=['GET'])

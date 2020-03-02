@@ -56,4 +56,31 @@ class publishers:
 
     def get_dbconnection(self, dbc):
         self.conn = dbc
-        
+    
+
+class authors:
+
+    def __init__(self, id, name, last_name, born_date):
+        self.id = id
+        self.name = name
+        self.last_name = last_name
+        self.born_date = born_date
+    
+    def add_author(self):
+        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date}
+        result = self.conn.insert_record("authors",dic_author)
+        return result
+
+    def update_author(self):
+        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date}
+        condition = "iduthor = " + self.id
+        result = self.conn.update_record("authors", dic_author, condition)
+        return result
+
+    def delete_authors(self):
+        dic_author = {'idauthor' : self.id}
+        result = self.conn.delete_record("authors",dic_author)
+        return result
+    
+    def get_dbconnection(self, dbc):
+        self.conn = dbc
