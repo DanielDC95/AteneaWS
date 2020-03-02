@@ -61,7 +61,6 @@ class db_connection:
             query_insert = "Insert Into {} ({}) Values ({});".format(table,fields,values)
             
             cursor = self.connection.cursor()
-            print(query_insert)
             cursor.execute(query_insert)
             self.connection.commit()
             

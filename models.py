@@ -27,3 +27,33 @@ class genres:
 
     def get_dbconnection(self,dbc):
         self.conn = dbc
+
+
+class publishers:
+
+    def __init__(self,id,name):
+        self.id = id
+        self.name = name
+    
+    def get_name(self):
+        return self.name
+
+    def add_publisher(self):
+        dic_publisher = {'name' : self.name}
+        result = self.conn.insert_record("publishers",dic_publisher)
+        return result
+
+    def update_publisher(self):
+        dic_publisher = {'name' : self.name}
+        condition = "idpublisher = " + self.id
+        result = self.conn.update_record("publishers",dic_publisher,condition)
+        return result
+
+    def delete_publisher(self):
+        dic_publicher = {'idpublisher' : self.id}
+        result = self.conn.delete_record("publisher",dic_publicher)
+        return result
+
+    def get_dbconnection(self, dbc):
+        self.conn = dbc
+        
