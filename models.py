@@ -60,19 +60,20 @@ class publishers:
 
 class authors:
 
-    def __init__(self, id, name, last_name, born_date):
+    def __init__(self, id, name, last_name, born_date, id_country):
         self.id = id
         self.name = name
         self.last_name = last_name
         self.born_date = born_date
+        self.id_country = id_country
     
     def add_author(self):
-        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date}
+        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date, 'idcountry' : self.id_country}
         result = self.conn.insert_record("authors",dic_author)
         return result
 
     def update_author(self):
-        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date}
+        dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date, 'idcountry' : self.id_country}
         condition = "idauthor = " + self.id
         result = self.conn.update_record("authors", dic_author, condition)
         return result
