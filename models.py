@@ -73,14 +73,41 @@ class authors:
 
     def update_author(self):
         dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date}
-        condition = "iduthor = " + self.id
+        condition = "idauthor = " + self.id
         result = self.conn.update_record("authors", dic_author, condition)
         return result
 
-    def delete_authors(self):
+    def delete_author(self):
         dic_author = {'idauthor' : self.id}
         result = self.conn.delete_record("authors",dic_author)
         return result
     
+    def get_dbconnection(self, dbc):
+        self.conn = dbc
+
+
+class countrys:
+
+    def __init__(self, id, code, name):
+        self.id = id
+        self.code = code 
+        self.name = name 
+    
+    def add_country(self):
+        dic_country = {'code': self.code,'name' : self.name}
+        result = self.conn.insert_record("country", dic_country)
+        return result
+
+    def update_country(self):
+        dic_country = {'code': self.code,'name' : self.name}
+        condition = "idcountry = " + self.id
+        result = self.conn.update_record("country", dic_country, condition)
+        return result
+
+    def delete_country(self):
+        dic_country = {'idcountry' :  self.id}
+        result = self.conn.delete_record("country", dic_country)
+        return result
+
     def get_dbconnection(self, dbc):
         self.conn = dbc

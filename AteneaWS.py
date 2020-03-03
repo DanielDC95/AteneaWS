@@ -3,11 +3,11 @@ from flask import request
 from db_connection import db_connection
 import psycopg2
 import json
-from models import genres, publishers, authors
+from models import genres, publishers, authors, countrys
 
 app = Flask(__name__)
 
-dbc = db_connection("user","password","localhost","5432","ateneadb")
+dbc = db_connection("","","localhost","5432","ateneadb")
 dbc.connect_to_db()
 
 #Returns a genre list
@@ -152,7 +152,11 @@ def add_author():
         id = 0
         name = "{}".format(request_json["name"])
         name = name.replace("'", "''")
-        my_author = authors(id,name)
+        last_name = "{}".format(request_json["last_name"])
+        last_name = last_name.replace("'", "''")
+        born_date = "{}".format(request_json["born_date"])
+        born_date = born_date.replace("'", "''")
+        my_author = authors(id,name,last_name,born_date)
         my_author.get_dbconnection(dbc)
         result = my_author.add_author()
         
@@ -165,7 +169,11 @@ def update_author():
         request_json = request.get_json()
         name = "{}".format(request_json["name"])
         name = name.replace("'", "''")
-        my_author = authors("{}".format(request_json["id"]),name)
+        last_name = "{}".format(request_json["last_name"])
+        last_name = last_name.replace("'", "''")
+        born_date = "{}".format(request_json["born_date"])
+        born_date = born_date.replace("'", "''")
+        my_author = authors("{}".format(request_json["id"]),name,last_name,born_date)
         my_author.get_dbconnection(dbc)
         result = my_author.update_author()
         return jsonify({"about":"{}".format(result)})
@@ -177,9 +185,74 @@ def delete_author():
         request_json = request.get_json()
         name = "{}".format(request_json["name"])
         name = name.replace("'", "''")
-        my_author = authors("{}".format(request_json["id"]),name)
+        last_name = "{}".format(request_json["last_name"])
+        last_name = last_name.replace("'", "''")
+        born_date = "{}".format(request_json["born_date"])
+        born_date = born_date.replace("'", "''")
+        my_author = authors("{}".format(request_json["id"]),name,last_name,born_date)
         my_author.get_dbconnection(dbc)
         result = my_author.delete_author()
+        return jsonify({"about":"{}".format(result)})
+
+################################Countrys
+#Returns a country list
+@app.route("/get_countrys", methods=['GET'])
+def get_countrys():
+    if (request.method == 'GET'):
+        query_result = []
+        cursor_dic = {}
+       
+        cursor = dbc.execute_query("Select * From country;")
+        
+        for row in cursor:
+            cursor_dic = {}
+
+            for col, description in enumerate(cursor.description):
+                cursor_dic.update({description[0] : row[col]})
+            
+            query_result.append(cursor_dic)
+        
+        return jsonify(query_result)
+
+#Add a new country
+@app.route("/add_country", methods = ['POST'])
+def add_country():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        id = 0
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        code = "{}".format(request_json["code"])
+        my_country = countrys(id,code,name)
+        my_country.get_dbconnection(dbc)
+        result = my_country.add_country()
+        
+        return jsonify({"about":"{}".format(result)})
+
+#Update a country
+@app.route("/update_country", methods = ['POST'])
+def update_country():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        code = "{}".format(request_json["code"])
+        my_country = countrys("{}".format(request_json["id"]),code,name)
+        my_country.get_dbconnection(dbc)
+        result = my_country.update_country()
+        return jsonify({"about":"{}".format(result)})
+
+#Delete a country
+@app.route("/delete_country", methods = ['POST'])
+def delete_country():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        code = "{}".format(request_json["code"])
+        my_country = countrys("{}".format(request_json["id"]),code,name)
+        my_country.get_dbconnection(dbc)
+        result = my_country.delete_country()
         return jsonify({"about":"{}".format(result)})
 
 # @app.route('/multi/<int:num>', methods=['GET'])
