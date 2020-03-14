@@ -3,7 +3,7 @@ from flask import request
 from db_connection import db_connection
 import psycopg2
 import json
-from models import genres, publishers, authors, countrys
+from models import genres, publishers, authors, countrys, books
 
 app = Flask(__name__)
 
@@ -251,6 +251,80 @@ def update_country():
 #Delete a country
 @app.route("/delete_country", methods = ['POST'])
 def delete_country():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        name = "{}".format(request_json["name"])
+        name = name.replace("'", "''")
+        code = "{}".format(request_json["code"])
+        my_country = countrys("{}".format(request_json["id"]),code,name)
+        my_country.get_dbconnection(dbc)
+        result = my_country.delete_country()
+        return jsonify({"about":"{}".format(result)})
+
+################################Books
+#Returns a book list
+@app.route("/get_books", methods=['GET'])
+def get_books():
+    if (request.method == 'GET'):
+        query_result = []
+        cursor_dic = {}
+       
+        cursor = dbc.execute_query("Select * From books;")
+        
+        for row in cursor:
+            cursor_dic = {}
+
+            for col, description in enumerate(cursor.description):
+                cursor_dic.update({description[0] : row[col]})
+            
+            query_result.append(cursor_dic)
+        
+        return jsonify(query_result)
+
+#Add a new book
+@app.route("/add_book", methods = ['POST'])
+def add_book():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        id = 0
+        isbn = "{}".format(request_json["ISBN"])
+        title = "{}".format(request_json["Title"])
+        id_publisher = "{}".format(request_json["Id_publisher"])
+        id_genre = "{}".format(request_json["Id_genre"])
+        published_date = "{}".format(request_json["Published_date"])
+        description = "{}".format(request_json["Description"])
+        price = "{}".format(request_json["Price"])
+        image_path = "{}".format(request_json["Image_path"])
+
+        my_book = books(id,isbn,title,id_publisher,id_genre,published_date,description,price,image_path)
+        my_book.get_dbconnection(dbc)
+        result = my_book.add_book()
+        
+        return jsonify({"about":"{}".format(result)})
+
+#Update a book
+@app.route("/update_book", methods = ['POST'])
+def update_book():
+    if request.method == 'POST':
+        request_json = request.get_json()
+        id = "{}".format(request_json["Id"])
+        isbn = "{}".format(request_json["ISBN"])
+        title = "{}".format(request_json["Title"])
+        id_publisher = "{}".format(request_json["Id_publisher"])
+        id_genre = "{}".format(request_json["Id_genre"])
+        published_date = "{}".format(request_json["Published_date"])
+        description = "{}".format(request_json["Description"])
+        price = "{}".format(request_json["Price"])
+        image_path = "{}".format(request_json["Image_path"])
+
+        my_book = books(id,isbn,title,id_publisher,id_genre,published_date,description,price,image_path)
+        my_book.get_dbconnection(dbc)
+        result = my_book.update_book()
+        return jsonify({"about":"{}".format(result)})
+
+#Delete a book
+@app.route("/delete_book", methods = ['POST'])
+def delete_book():
     if request.method == 'POST':
         request_json = request.get_json()
         name = "{}".format(request_json["name"])

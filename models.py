@@ -112,3 +112,36 @@ class countrys:
 
     def get_dbconnection(self, dbc):
         self.conn = dbc
+
+
+class books:
+
+    def __init__(self, id, isbn, title, id_publisher, id_genre, published_date, description, price, image_path):
+        self.id = id
+        self.isbn = isbn
+        self.title = title 
+        self.id_publisher = id_publisher
+        self.id_genre = id_genre
+        self.publiched_date = published_date
+        self.description = description
+        self.price = price
+        self.image_path = image_path
+    
+    def add_book(self):
+        dic_book = {'idbook': self.id, 'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
+        result = self.conn.insert_record("books", dic_book)
+        return result
+
+    def update_book(self):
+        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
+        condition = "idbook = " + self.id
+        result = self.conn.update_record("books", dic_book, condition)
+        return result
+
+    def delete_book(self):
+        dic_book = {'idbook': self.id}
+        result = self.conn.delete_record("books", dic_book)
+        return result
+
+    def get_dbconnection(self, dbc):
+        self.conn = dbc
