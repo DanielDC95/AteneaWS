@@ -1,4 +1,5 @@
 import psycopg2
+import sys
 
 class db_connection:
 
@@ -15,9 +16,13 @@ class db_connection:
         self.connection = connection
 
     def execute_query(self, query):
-        cursor = self.connection.cursor()
-        cursor.execute(query)
-        self.connection.commit()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query)
+            self.connection.commit()
+        except :
+            #result = "Failure"
+            print("Unexpected error:", sys.exc_info()[0])
         return cursor
 
     def update_record(self, table, dic, condition):
@@ -28,8 +33,7 @@ class db_connection:
             for key in dic.keys():
                 if first == True:
                     fields = key + " = '" + dic[key] + "'"
-                    first = False
-                else: 
+                    first = False 
                     fields += ", " + key + " = '" + dic[key] + "'"
                 
             query_update = "Update {} Set {} Where {};".format(table,fields,condition)
@@ -42,33 +46,55 @@ class db_connection:
             result = "Failure"
         return result
 
-    def insert_record(self, table, dic):
+    def insert_record(self, table, table_id, dic):
         fields = ""
         values = ""
         first = True
         result = ""
+        query_condition = ""
+        query_result = []
 
         try:
+
+            #Orders the fields and values to insert
             for key in dic.keys():
+                print(key)
                 if first == True:
                     fields = key
                     values = "'" + dic[key] + "'"
+                    query_condition = key + " = '" + dic[key] + "'"
                     first = False
                 else:
                     fields += ", " + key
                     values += ", '" + dic[key] + "'"
+                    query_condition += " And " + key + " = '" + dic[key] + "'"
             
             query_insert = "Insert Into {} ({}) Values ({});".format(table,fields,values)
+            print(query_insert)
             
             cursor = self.connection.cursor()
             cursor.execute(query_insert)
             self.connection.commit()
-            
-            result = "Success"
-        except:
-            result = "Failure"
-        
-        return result
+
+            query_select = "Select {} From {} Where {};".format(table_id,table,query_condition)
+            print(query_select)
+            cursor.execute(query_select)
+            self.connection.commit()
+
+            for row in cursor:
+                result_dic = {"result": "Success"}
+
+                for col, description in enumerate(cursor.description):
+                    result_dic.update({description[0] : row[col]})
+                
+
+            #result = "Success"
+        except :
+            result_dic = {"result": "Failure"}
+            # result = "Failure"
+            # print("Unexpected error:", sys.exc_info()[0])
+        print(result_dic)
+        return result_dic
 
     def delete_record(self, table, conditionDic):
         result = ""

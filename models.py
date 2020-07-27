@@ -1,4 +1,5 @@
 from db_connection import db_connection
+from flask import jsonify
 
 class genres:
 
@@ -17,7 +18,7 @@ class genres:
     
     def add_genre(self):
         dic_genre = {'name': self.name}
-        result = self.conn.insert_record("genres",dic_genre)
+        result = self.conn.insert_record("genres","idgenre",dic_genre)
         return result
 
     def delete_genre(self):
@@ -40,7 +41,7 @@ class publishers:
 
     def add_publisher(self):
         dic_publisher = {'name' : self.name}
-        result = self.conn.insert_record("publishers",dic_publisher)
+        result = self.conn.insert_record("publishers","idpublisher",dic_publisher)
         return result
 
     def update_publisher(self):
@@ -69,7 +70,7 @@ class authors:
     
     def add_author(self):
         dic_author = {'name' : self.name, 'lastname' : self.last_name, 'borndate' : self.born_date, 'idcountry' : self.id_country}
-        result = self.conn.insert_record("authors",dic_author)
+        result = self.conn.insert_record("authors","idauthor",dic_author)
         return result
 
     def update_author(self):
@@ -96,7 +97,7 @@ class countrys:
     
     def add_country(self):
         dic_country = {'code': self.code,'name' : self.name}
-        result = self.conn.insert_record("country", dic_country)
+        result = self.conn.insert_record("country","idcountry", dic_country)
         return result
 
     def update_country(self):
@@ -116,10 +117,11 @@ class countrys:
 
 class books:
 
-    def __init__(self, id, isbn, title, id_publisher, id_genre, published_date, description, price, image_path):
+    def __init__(self, id, isbn, title, list_authors, id_publisher, id_genre, published_date, description, price, image_path):
         self.id = id
         self.isbn = isbn
         self.title = title 
+        self.list_authors = list_authors
         self.id_publisher = id_publisher
         self.id_genre = id_genre
         self.publiched_date = published_date
@@ -128,9 +130,55 @@ class books:
         self.image_path = image_path
     
     def add_book(self):
-        dic_book = {'idbook': self.id, 'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
-        result = self.conn.insert_record("books", dic_book)
-        return result
+        msg = ""
+        v_authors = self.verify_authors()
+        v_publishers = self.verify_publishers()
+        v_genres = self.verify_genres()
+        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
+
+        if len(v_authors) > 0:
+            authors = ""
+            for i in range(len(v_authors)):
+                if i == 0:
+                    authors = "{}".format(v_authors[i])
+                else:
+                    authors += ", {}".format(v_authors[i])
+                
+            result = {"result": "Los siguientes id's de autores no existen: {}".format(authors)}
+            return result   
+
+        if len(v_publishers) > 0:
+            publishers = ""
+            for i in range(len(v_publishers)):
+                if i == 0:
+                    publishers = "{}".format(v_publishers[i])
+                else:
+                    publishers += ", {}".format(v_publishers[i])
+                
+            result = {"result": "Los siguientes id's de editoriales no existen: {}".format(publishers)}
+            return result   
+        
+        if len(v_genres) > 0:
+            genres = ""
+            for i in range(len(v_genres)):
+                if i == 0:
+                    genres = "{}".format(v_genres[i])
+                else:
+                    genres += ", {}".format(v_genres[i])
+                
+            result = {"result": "Los siguientes id's de generos no existen: {}".format(genres)}
+            return result   
+        
+        result = self.conn.insert_record("books","idbook", dic_book)
+        self.id = result["idbook"]
+        
+        #if result=="Success":
+        for i in range(len(self.list_authors)):
+            dic_book_authors = eval(self.list_authors[i])
+            dic_book_authors['idbook'] = "{}".format(self.id )
+            result2 = self.conn.insert_record("bookauthors","id", dic_book_authors)
+
+        return result2   
 
     def update_book(self):
         dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
@@ -145,3 +193,49 @@ class books:
 
     def get_dbconnection(self, dbc):
         self.conn = dbc
+
+    def verify_authors(self):
+        not_exits_list = []
+        for i in (0, len(self.list_authors)-1):
+            
+            dic_author = eval(self.list_authors[i])
+
+            for key in dic_author.keys():
+                author_id = dic_author[key]
+                query = "Select Count(name) from authors where idauthor = {};".format(author_id)
+                cursor = self.conn.execute_query(query)
+            
+
+                for row in cursor:
+                    count_result = row[0]
+
+            if count_result == 0:
+                not_exits_list.append(author_id)
+        
+        return not_exits_list
+
+    def verify_publishers(self):
+        not_exits_list = []
+        query = "Select Count(name) from publishers where idpublisher = {};".format(self.id_publisher)
+        cursor = self.conn.execute_query(query)
+
+        for row in cursor:
+            count_result = row[0]
+        
+        if count_result == 0:
+                not_exits_list.append(self.id_publisher)
+
+        return not_exits_list
+
+    def verify_genres(self):
+        not_exits_list = []
+        query = "Select Count(name) from genres where idgenre = {};".format(self.id_genre)
+        cursor = self.conn.execute_query(query)
+
+        for row in cursor:
+            count_result = row[0]
+        
+        if count_result == 0:
+                not_exits_list.append(self.id_genre)
+
+        return not_exits_list
