@@ -54,7 +54,7 @@ def update_genre():
         my_genre = genres("{}".format(request_json["id"]),"{}".format(request_json["name"]))
         my_genre.get_dbconnection(dbc)
         result = my_genre.update_genre()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Delete a genre
 @app.route("/delete_genre", methods = ['POST'])
@@ -64,7 +64,7 @@ def delete_genre():
         my_genre = genres("{}".format(request_json["id"]),"{}".format(request_json["name"]))
         my_genre.get_dbconnection(dbc)
         result = my_genre.delete_genre()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 #endregion
 
 #region Publisher
@@ -99,7 +99,7 @@ def add_publisher():
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.add_publisher()
         
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Update a publisher
 @app.route("/update_publisher", methods = ['POST'])
@@ -111,7 +111,7 @@ def update_publisher():
         my_publisher = publishers("{}".format(request_json["id"]),name)
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.update_publisher()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Delete a publisher
 @app.route("/delete_publisher", methods = ['POST'])
@@ -123,7 +123,7 @@ def delete_publisher():
         my_publisher = publishers("{}".format(request_json["id"]),name)
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.delete_publisher()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 #endregion
 
 #region Author
@@ -164,7 +164,7 @@ def add_author():
         my_author.get_dbconnection(dbc)
         result = my_author.add_author()
         
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Update a author
 @app.route("/update_author", methods = ['POST'])
@@ -182,7 +182,7 @@ def update_author():
         my_author = authors(id,name,last_name,born_date,id_country)
         my_author.get_dbconnection(dbc)
         result = my_author.update_author()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Delete a author
 @app.route("/delete_author", methods = ['POST'])
@@ -200,7 +200,7 @@ def delete_author():
         my_author = authors(id,name,last_name,born_date,id_country)
         my_author.get_dbconnection(dbc)
         result = my_author.delete_author()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 #endregion
 
 #region Country
@@ -236,7 +236,7 @@ def add_country():
         my_country.get_dbconnection(dbc)
         result = my_country.add_country()
         
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Update a country
 @app.route("/update_country", methods = ['POST'])
@@ -249,7 +249,7 @@ def update_country():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.update_country()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 
 #Delete a country
 @app.route("/delete_country", methods = ['POST'])
@@ -262,7 +262,7 @@ def delete_country():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.delete_country()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 #endregion
 
 #region Book
@@ -320,17 +320,19 @@ def add_book():
 @app.route("/update_book", methods = ['POST'])
 def update_book():
     if request.method == 'POST':
+        query_result = []
+
         request_json = request.get_json()
-        id = "{}".format(request_json["Id"])
-        isbn = "{}".format(request_json["ISBN"])
-        title = "{}".format(request_json["Title"])
+        id = "{}".format(request_json["id"])
+        isbn = "{}".format(request_json["isbn"])
+        title = "{}".format(request_json["title"])
         str_authors = "{}".format(request_json["authors"])
-        id_publisher = "{}".format(request_json["Id_publisher"])
-        id_genre = "{}".format(request_json["Id_genre"])
-        published_date = "{}".format(request_json["Published_date"])
-        description = "{}".format(request_json["Description"])
-        price = "{}".format(request_json["Price"])
-        image_path = "{}".format(request_json["Image_path"])
+        id_publisher = "{}".format(request_json["id_publisher"])
+        id_genre = "{}".format(request_json["id_genre"])
+        published_date = "{}".format(request_json["published_date"])
+        description = "{}".format(request_json["description"])
+        price = "{}".format(request_json["price"])
+        image_path = "{}".format(request_json["image_path"])
 
         #converts the authors string to a list
         str_authors = str_authors.replace("[","")
@@ -340,7 +342,9 @@ def update_book():
         my_book = books(id,isbn,title,authors_list,id_publisher,id_genre,published_date,description,price,image_path)
         my_book.get_dbconnection(dbc)
         result = my_book.update_book()
-        return jsonify({"about":"{}".format(result)})
+        query_result.append(result)
+        return jsonify(query_result)
+        #return jsonify({"result":"{}".format(result)})
 
 #Delete a book
 @app.route("/delete_book", methods = ['POST'])
@@ -353,7 +357,7 @@ def delete_book():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.delete_country()
-        return jsonify({"about":"{}".format(result)})
+        return jsonify({"result":"{}".format(result)})
 #endregion
 
 # @app.route('/multi/<int:num>', methods=['GET'])

@@ -29,22 +29,25 @@ class db_connection:
         fields = ""
         first = True
         result = ""
+
         try:
             for key in dic.keys():
                 if first == True:
                     fields = key + " = '" + dic[key] + "'"
-                    first = False 
+                    first = False
+                else:
                     fields += ", " + key + " = '" + dic[key] + "'"
-                
+
             query_update = "Update {} Set {} Where {};".format(table,fields,condition)
-            #print(query_update)
+            print(query_update)
             cursor = self.connection.cursor()
             cursor.execute(query_update)
             self.connection.commit()
-            result = "Success"
-        except:
-            result = "Failure"
-        return result
+            result_dic = {"result": "Success", "message": "Ok"}
+        except :
+            result_dic = {"result": "Failure", "message": "Error {} occurred.".format(sys.exc_info()[0])}
+        
+        return result_dic
 
     def insert_record(self, table, table_id, dic):
         fields = ""
@@ -82,18 +85,14 @@ class db_connection:
             self.connection.commit()
 
             for row in cursor:
-                result_dic = {"result": "Success"}
+                result_dic = {"result": "Success", "message": "Ok"}
 
                 for col, description in enumerate(cursor.description):
                     result_dic.update({description[0] : row[col]})
                 
-
-            #result = "Success"
         except :
             result_dic = {"result": "Failure"}
-            # result = "Failure"
-            # print("Unexpected error:", sys.exc_info()[0])
-        print(result_dic)
+            
         return result_dic
 
     def delete_record(self, table, conditionDic):

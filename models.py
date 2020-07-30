@@ -130,7 +130,7 @@ class books:
         self.image_path = image_path
     
     def add_book(self):
-        msg = ""
+        
         v_authors = self.verify_authors()
         v_publishers = self.verify_publishers()
         v_genres = self.verify_genres()
@@ -144,7 +144,7 @@ class books:
                 else:
                     authors += ", {}".format(v_authors[i])
                 
-            result = {"result": "Los siguientes id's de autores no existen: {}".format(authors)}
+            result = {"result": "Failure", "message": "Falla en la creacion, los siguientes id's de autores no existen: {}".format(authors)}
             return result   
 
         if len(v_publishers) > 0:
@@ -155,7 +155,7 @@ class books:
                 else:
                     publishers += ", {}".format(v_publishers[i])
                 
-            result = {"result": "Los siguientes id's de editoriales no existen: {}".format(publishers)}
+            result = {"result": "Failure", "message": "Falla en la creacion, los siguientes id's de editoriales no existen: {}".format(publishers)}
             return result   
         
         if len(v_genres) > 0:
@@ -166,13 +166,12 @@ class books:
                 else:
                     genres += ", {}".format(v_genres[i])
                 
-            result = {"result": "Los siguientes id's de generos no existen: {}".format(genres)}
+            result = {"result": "Failure", "message": "Falla en la creacion, los siguientes id's de generos no existen: {}".format(genres)}
             return result   
         
         result = self.conn.insert_record("books","idbook", dic_book)
         self.id = result["idbook"]
         
-        #if result=="Success":
         for i in range(len(self.list_authors)):
             dic_book_authors = eval(self.list_authors[i])
             dic_book_authors['idbook'] = "{}".format(self.id )
@@ -181,9 +180,48 @@ class books:
         return result2   
 
     def update_book(self):
+        
+        v_authors = self.verify_authors()
+        v_publishers = self.verify_publishers()
+        v_genres = self.verify_genres()
         dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
+
+        if len(v_authors) > 0:
+            authors = ""
+            for i in range(len(v_authors)):
+                if i == 0:
+                    authors = "{}".format(v_authors[i])
+                else:
+                    authors += ", {}".format(v_authors[i])
+                
+            result = {"result": "Failure", "message": "Falla en la actualizacion, los siguientes id's de autores no existen: {}".format(authors)}
+            return result   
+
+        if len(v_publishers) > 0:
+            publishers = ""
+            for i in range(len(v_publishers)):
+                if i == 0:
+                    publishers = "{}".format(v_publishers[i])
+                else:
+                    publishers += ", {}".format(v_publishers[i])
+                
+            result = {"result": "Failure", "message": "Falla en la actualizacion, los siguientes id's de editoriales no existen: {}".format(publishers)}
+            return result   
+        
+        if len(v_genres) > 0:
+            genres = ""
+            for i in range(len(v_genres)):
+                if i == 0:
+                    genres = "{}".format(v_genres[i])
+                else:
+                    genres += ", {}".format(v_genres[i])
+                
+            result = {"result": "Failure", "message": "Falla en la actualizacion, los siguientes id's de generos no existen: {}".format(genres)}
+            return result   
+        
         condition = "idbook = " + self.id
         result = self.conn.update_record("books", dic_book, condition)
+        
         return result
 
     def delete_book(self):
