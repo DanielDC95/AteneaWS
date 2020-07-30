@@ -291,6 +291,8 @@ def get_books():
 def add_book():
     if request.method == 'POST':
         query_result = []
+        
+        #Get the data
         request_json = request.get_json()
         id = 0
         isbn = "{}".format(request_json["isbn"])
@@ -321,7 +323,8 @@ def add_book():
 def update_book():
     if request.method == 'POST':
         query_result = []
-
+        
+        #Get the data
         request_json = request.get_json()
         id = "{}".format(request_json["id"])
         isbn = "{}".format(request_json["isbn"])
@@ -350,6 +353,8 @@ def update_book():
 @app.route("/delete_book", methods = ['POST'])
 def delete_book():
     if request.method == 'POST':
+
+        #Get the data
         request_json = request.get_json()
         name = "{}".format(request_json["name"])
         name = name.replace("'", "''")

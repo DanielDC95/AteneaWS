@@ -131,10 +131,10 @@ class books:
     
     def add_book(self):
         
+        #Verify that the data exist
         v_authors = self.verify_authors()
         v_publishers = self.verify_publishers()
         v_genres = self.verify_genres()
-        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
 
         if len(v_authors) > 0:
             authors = ""
@@ -169,9 +169,13 @@ class books:
             result = {"result": "Failure", "message": "Falla en la creacion, los siguientes id's de generos no existen: {}".format(genres)}
             return result   
         
+        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
+
+        #Insert in the books table
         result = self.conn.insert_record("books","idbook", dic_book)
         self.id = result["idbook"]
         
+        #Insert in the books authors table
         for i in range(len(self.list_authors)):
             dic_book_authors = eval(self.list_authors[i])
             dic_book_authors['idbook'] = "{}".format(self.id )
@@ -181,11 +185,11 @@ class books:
 
     def update_book(self):
         
+        #Verify that the data exist
         v_authors = self.verify_authors()
         v_publishers = self.verify_publishers()
         v_genres = self.verify_genres()
-        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
-
+        
         if len(v_authors) > 0:
             authors = ""
             for i in range(len(v_authors)):
@@ -219,7 +223,10 @@ class books:
             result = {"result": "Failure", "message": "Falla en la actualizacion, los siguientes id's de generos no existen: {}".format(genres)}
             return result   
         
+        dic_book = {'isbn': self.isbn, 'title': self.title, 'idpublisher': self.id_publisher, 'idgenre': self.id_genre, 'publisheddate': self.publiched_date, 'description': self.description, 'price': self.price, 'imagepath': self.image_path }
         condition = "idbook = " + self.id
+        
+        #Update the books table
         result = self.conn.update_record("books", dic_book, condition)
         
         return result
@@ -234,10 +241,13 @@ class books:
 
     def verify_authors(self):
         not_exits_list = []
+
         for i in (0, len(self.list_authors)-1):
             
+            #Get one auhtor
             dic_author = eval(self.list_authors[i])
 
+            #Get the record count with the author ID
             for key in dic_author.keys():
                 author_id = dic_author[key]
                 query = "Select Count(name) from authors where idauthor = {};".format(author_id)
@@ -247,6 +257,7 @@ class books:
                 for row in cursor:
                     count_result = row[0]
 
+            #If the author doesn't exist, it is added to the list
             if count_result == 0:
                 not_exits_list.append(author_id)
         
@@ -257,9 +268,11 @@ class books:
         query = "Select Count(name) from publishers where idpublisher = {};".format(self.id_publisher)
         cursor = self.conn.execute_query(query)
 
+        #Get the record count with the publisher ID
         for row in cursor:
             count_result = row[0]
         
+        #If the publisher doesn't exist, it is added to the list
         if count_result == 0:
                 not_exits_list.append(self.id_publisher)
 
@@ -270,9 +283,11 @@ class books:
         query = "Select Count(name) from genres where idgenre = {};".format(self.id_genre)
         cursor = self.conn.execute_query(query)
 
+        #Get the record count with the genre ID
         for row in cursor:
             count_result = row[0]
         
+        #If the genre doesn't exist, it is added to the list
         if count_result == 0:
                 not_exits_list.append(self.id_genre)
 

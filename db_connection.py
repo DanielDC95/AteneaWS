@@ -31,6 +31,8 @@ class db_connection:
         result = ""
 
         try:
+
+            #Orders the fields and values to insert
             for key in dic.keys():
                 if first == True:
                     fields = key + " = '" + dic[key] + "'"
@@ -39,17 +41,19 @@ class db_connection:
                     fields += ", " + key + " = '" + dic[key] + "'"
 
             query_update = "Update {} Set {} Where {};".format(table,fields,condition)
-            print(query_update)
+            
+            #Execute the query
             cursor = self.connection.cursor()
             cursor.execute(query_update)
             self.connection.commit()
+            
             result_dic = {"result": "Success", "message": "Ok"}
         except :
             result_dic = {"result": "Failure", "message": "Error {} occurred.".format(sys.exc_info()[0])}
         
         return result_dic
 
-    def insert_record(self, table, table_id, dic):
+    def insert_record(self, table, table_id_name, dic):
         fields = ""
         values = ""
         first = True
@@ -73,17 +77,18 @@ class db_connection:
                     query_condition += " And " + key + " = '" + dic[key] + "'"
             
             query_insert = "Insert Into {} ({}) Values ({});".format(table,fields,values)
-            print(query_insert)
             
+            #Execute the query
             cursor = self.connection.cursor()
             cursor.execute(query_insert)
             self.connection.commit()
 
-            query_select = "Select {} From {} Where {};".format(table_id,table,query_condition)
-            print(query_select)
+            #Execute a query to get the record id
+            query_select = "Select {} From {} Where {};".format(table_id_name,table,query_condition)
             cursor.execute(query_select)
             self.connection.commit()
 
+            #Build the response
             for row in cursor:
                 result_dic = {"result": "Success", "message": "Ok"}
 
