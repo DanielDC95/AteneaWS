@@ -7,6 +7,7 @@ from models import genres, publishers, authors, countrys, books
 
 app = Flask(__name__)
 
+#Conexion a base de datos
 dbc = db_connection("user","password","localhost","5432","db")
 dbc.connect_to_db()
 
@@ -17,7 +18,8 @@ def get_genres():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-       
+        other_dic = {}
+        i = 1
         cursor = dbc.execute_query("Select * From genres;")
         
         for row in cursor:
@@ -26,9 +28,13 @@ def get_genres():
             for col, description in enumerate(cursor.description):
                 cursor_dic.update({description[0] : row[col]})
             
-            query_result.append(cursor_dic)
+            #query_result.append(cursor_dic)
+            other_dic.update({"result_{}".format(i): cursor_dic})
+            i += 1
         
-        return jsonify(query_result)
+        #other_dic.update({"result": query_result})
+        json_result = json.dumps(other_dic)
+        return jsonify(other_dic)
 
 #Add a new genre
 @app.route("/add_genre", methods = ['POST'])
@@ -39,12 +45,14 @@ def add_genre():
         id = 0
         name = "{}".format(request_json["name"])
         name = name.replace("'", "''")
-        print(name)
+        
         my_genre = genres(id,name)
         my_genre.get_dbconnection(dbc)
         result = my_genre.add_genre()
-        query_result.append(result)
-        return jsonify(query_result)
+        #json_result = json.dumps(result)
+        #query_result.append(result)
+        return jsonify(result)
+        #return json_result
 
 #Update a genre
 @app.route("/update_genre", methods = ['POST'])
@@ -54,7 +62,8 @@ def update_genre():
         my_genre = genres("{}".format(request_json["id"]),"{}".format(request_json["name"]))
         my_genre.get_dbconnection(dbc)
         result = my_genre.update_genre()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Delete a genre
 @app.route("/delete_genre", methods = ['POST'])
@@ -64,7 +73,8 @@ def delete_genre():
         my_genre = genres("{}".format(request_json["id"]),"{}".format(request_json["name"]))
         my_genre.get_dbconnection(dbc)
         result = my_genre.delete_genre()
-        return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
+        #return jsonify({"result":"{}".format(result)})
 #endregion
 
 #region Publisher
@@ -74,7 +84,9 @@ def get_publishers():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-       
+        other_dic = {}
+        i = 1
+
         cursor = dbc.execute_query("Select * From publishers;")
         
         for row in cursor:
@@ -83,9 +95,12 @@ def get_publishers():
             for col, description in enumerate(cursor.description):
                 cursor_dic.update({description[0] : row[col]})
             
-            query_result.append(cursor_dic)
+            #query_result.append(cursor_dic)
+            other_dic.update({"result_{}".format(i): cursor_dic})
+            i += 1
         
-        return jsonify(query_result)
+        #return jsonify(query_result)
+        return jsonify(other_dic)
 
 #Add a new publisher
 @app.route("/add_publisher", methods = ['POST'])
@@ -99,7 +114,8 @@ def add_publisher():
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.add_publisher()
         
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Update a publisher
 @app.route("/update_publisher", methods = ['POST'])
@@ -111,7 +127,8 @@ def update_publisher():
         my_publisher = publishers("{}".format(request_json["id"]),name)
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.update_publisher()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Delete a publisher
 @app.route("/delete_publisher", methods = ['POST'])
@@ -123,7 +140,8 @@ def delete_publisher():
         my_publisher = publishers("{}".format(request_json["id"]),name)
         my_publisher.get_dbconnection(dbc)
         result = my_publisher.delete_publisher()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 #endregion
 
 #region Author
@@ -133,7 +151,9 @@ def get_authors():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-       
+        other_dic = {}
+        i = 1
+
         cursor = dbc.execute_query("Select * From authors;")
         
         for row in cursor:
@@ -142,9 +162,12 @@ def get_authors():
             for col, description in enumerate(cursor.description):
                 cursor_dic.update({description[0] : row[col]})
             
-            query_result.append(cursor_dic)
+            #query_result.append(cursor_dic)
+            other_dic.update({"result_{}".format(i): cursor_dic})
+            i += 1
         
-        return jsonify(query_result)
+        #return jsonify(query_result)
+        return jsonify(other_dic)
 
 #Add a new author
 @app.route("/add_author", methods = ['POST'])
@@ -164,7 +187,8 @@ def add_author():
         my_author.get_dbconnection(dbc)
         result = my_author.add_author()
         
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Update a author
 @app.route("/update_author", methods = ['POST'])
@@ -182,7 +206,8 @@ def update_author():
         my_author = authors(id,name,last_name,born_date,id_country)
         my_author.get_dbconnection(dbc)
         result = my_author.update_author()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Delete a author
 @app.route("/delete_author", methods = ['POST'])
@@ -200,7 +225,8 @@ def delete_author():
         my_author = authors(id,name,last_name,born_date,id_country)
         my_author.get_dbconnection(dbc)
         result = my_author.delete_author()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 #endregion
 
 #region Country
@@ -210,7 +236,9 @@ def get_countrys():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-       
+        other_dic = {}
+        i = 1
+
         cursor = dbc.execute_query("Select * From country;")
         
         for row in cursor:
@@ -219,9 +247,12 @@ def get_countrys():
             for col, description in enumerate(cursor.description):
                 cursor_dic.update({description[0] : row[col]})
             
-            query_result.append(cursor_dic)
+            #query_result.append(cursor_dic)
+            other_dic.update({"result_{}".format(i): cursor_dic})
+            i += 1
         
-        return jsonify(query_result)
+        #return jsonify(query_result)
+        return jsonify(other_dic)
 
 #Add a new country
 @app.route("/add_country", methods = ['POST'])
@@ -236,7 +267,8 @@ def add_country():
         my_country.get_dbconnection(dbc)
         result = my_country.add_country()
         
-        return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
+        #return jsonify({"result":"{}".format(result)})
 
 #Update a country
 @app.route("/update_country", methods = ['POST'])
@@ -249,7 +281,8 @@ def update_country():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.update_country()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Delete a country
 @app.route("/delete_country", methods = ['POST'])
@@ -262,7 +295,8 @@ def delete_country():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.delete_country()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 #endregion
 
 #region Book
@@ -272,9 +306,12 @@ def get_books():
     if (request.method == 'GET'):
         query_result = []
         cursor_dic = {}
-        print(1)
+        other_dic = {}
+        i = 1
+
+        #print(1)
         cursor = dbc.execute_query("Select * From books;")
-        print(2)
+        #print(2)
         for row in cursor:
             cursor_dic = {}
 
@@ -282,9 +319,12 @@ def get_books():
                 cursor_dic.update({description[0] : "{}".format(row[col])})
                 cursor_dic.update
             
-            query_result.append(cursor_dic)
+            #query_result.append(cursor_dic)
+            other_dic.update({"result_{}".format(i): cursor_dic})
+            i += 1
         
-        return jsonify(query_result)      
+        #return jsonify(query_result)      
+        return jsonify(other_dic)
 
 #Add a new book
 @app.route("/add_book", methods = ['POST'])
@@ -315,7 +355,8 @@ def add_book():
         my_book.get_dbconnection(dbc)
         result = my_book.add_book()
         query_result.append(result)
-        return jsonify(query_result)
+        #return jsonify(query_result)
+        return jsonify(result)
         
 
 #Update a book
@@ -346,8 +387,9 @@ def update_book():
         my_book.get_dbconnection(dbc)
         result = my_book.update_book()
         query_result.append(result)
-        return jsonify(query_result)
+        #return jsonify(query_result)
         #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 
 #Delete a book
 @app.route("/delete_book", methods = ['POST'])
@@ -362,7 +404,8 @@ def delete_book():
         my_country = countrys("{}".format(request_json["id"]),code,name)
         my_country.get_dbconnection(dbc)
         result = my_country.delete_country()
-        return jsonify({"result":"{}".format(result)})
+        #return jsonify({"result":"{}".format(result)})
+        return jsonify(result)
 #endregion
 
 # @app.route('/multi/<int:num>', methods=['GET'])
